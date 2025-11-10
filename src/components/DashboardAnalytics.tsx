@@ -117,7 +117,11 @@ export function DashboardAnalytics({ stats }: DashboardAnalyticsProps) {
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]}>
+                    {projectData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             ) : (

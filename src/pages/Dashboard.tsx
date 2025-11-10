@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ import { DashboardAnalytics } from '@/components/DashboardAnalytics';
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
@@ -175,28 +177,31 @@ export default function Dashboard() {
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat, index) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.3 }}
-          >
-            <Card className="task-card-hover border-border/50">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
-                  {stat.title}
-                </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-foreground">
-                  {loading ? '...' : stat.value}
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+            <motion.div
+              key={stat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1, duration: 0.3 }}
+            >
+              <Card className="task-card-hover border-border/50 cursor-pointer hover:shadow-lg transition-shadow">
+                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">
+                    {stat.title}
+                  </CardTitle>
+                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-foreground">
+                    {loading ? '...' : stat.value}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Click to view details
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
         ))}
       </div>
 
@@ -209,7 +214,10 @@ export default function Dashboard() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.4 + index * 0.1, duration: 0.3 }}
           >
-            <Card className="border-border/50">
+            <Card 
+              className="border-border/50 cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => navigate(`/${card.title.toLowerCase()}`)}
+            >
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
                 <CardTitle className="text-xl font-semibold">{card.title}</CardTitle>
                 <card.icon className={`h-6 w-6 ${card.color}`} />
@@ -220,6 +228,9 @@ export default function Dashboard() {
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
                   Total active {card.title.toLowerCase()}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Click to view all
                 </p>
               </CardContent>
             </Card>
