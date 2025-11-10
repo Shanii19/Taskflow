@@ -2,7 +2,6 @@ import {
   LayoutDashboard, 
   FolderKanban, 
   Users, 
-  Settings,
   LogOut,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
@@ -84,29 +83,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <Separator className="my-2" />
-
-        {isAdmin && (
-          <SidebarGroup>
-            <SidebarGroupLabel>Admin</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to="/settings"
-                      className="hover:bg-sidebar-accent transition-colors"
-                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
-                    >
-                      <Settings className="h-4 w-4" />
-                      {!isCollapsed && <span>Settings</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-4">
