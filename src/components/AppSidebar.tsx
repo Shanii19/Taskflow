@@ -47,7 +47,9 @@ export function AppSidebar() {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold text-sidebar-foreground">TaskFlow</span>
-              {isAdmin && <span className="text-xs text-muted-foreground">Admin</span>}
+              <span className="text-xs text-muted-foreground">
+                {isAdmin ? 'Admin' : 'Employee'}
+              </span>
             </div>
           </div>
         )}

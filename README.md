@@ -1,73 +1,203 @@
-# Welcome to your Lovable project
+# TaskFlow - Team Task Management Application
 
-## Project info
+A full-stack team task management application built with React, TypeScript, Tailwind CSS, Supabase, and Framer Motion.
 
-**URL**: https://lovable.dev/projects/578e1ec8-b49c-4123-922d-1adcdd3d7376
+## 🚀 Features
 
-## How can I edit this code?
+### Authentication & Authorization
+- Secure email/password authentication via Supabase Auth
+- Role-based access control (Admin & Employee roles)
+- Auto-confirmed email signups for testing
+- Protected routes with role verification
 
-There are several ways of editing your application.
+### Admin Capabilities
+- **Full Access**: Create, update, and delete all resources
+- **Team Management**: Create and manage teams
+- **Project Management**: Create projects, assign to teams, track progress and status
+- **Task Management**: Create, assign, and manage tasks
+- **Employee Management**: Invite and create employee accounts
+- **Analytics Dashboard**: View pie charts and bar graphs of project/task progress
 
-**Use Lovable**
+### Employee Capabilities
+- **View-Only Access**: View assigned tasks only
+- **Limited Dashboard**: See only relevant information
+- No create, edit, or delete permissions
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/578e1ec8-b49c-4123-922d-1adcdd3d7376) and start prompting.
+### Real-Time Features
+- Live updates using Supabase Realtime
+- Instant task and project changes across all clients
+- Real-time dashboard statistics
 
-Changes made via Lovable will be committed automatically to this repo.
+### Analytics & Reporting
+- **Pie Chart**: Task completion status (Completed, In Progress, Overdue)
+- **Bar Chart**: Project progress overview (Pending, In Progress, Completed)
+- Real-time data visualization using Recharts
 
-**Use your preferred IDE**
+## 🛠 Technology Stack
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, Framer Motion
+- **Backend**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Charts**: Recharts
+- **UI Components**: shadcn/ui
+- **Form Validation**: Zod
+- **Routing**: React Router v6
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 📊 Database Schema
 
-Follow these steps:
+### Core Tables
+- `profiles` - User profile information
+- `user_roles` - Role assignments (admin/member)
+- `teams` - Team management
+- `projects` - Project tracking with status and progress
+- `tasks` - Task assignments and tracking
+- `team_members` - Junction table for team memberships
+- `comments` - Task comments
+- `attachments` - File attachments
+- `activity_logs` - Audit trail
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🎯 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 1. Initial Admin Setup
 
-# Step 3: Install the necessary dependencies.
-npm i
+**IMPORTANT**: Create the admin account first!
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+- Email: `shayanmustafahassan@gmail.com`
+- Name: Shayan
+- Role: admin
+
+**Steps:**
+1. Navigate to `/auth` in the app
+2. Click "Sign Up" tab
+3. Register with the admin email and name
+4. After signup, update the role to admin:
+   - Open Lovable Cloud Backend
+   - Go to Database → user_roles table
+   - Find your user_id and change role from 'member' to 'admin'
+5. Log out and log back in
+
+📖 See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed setup instructions.
+
+### 2. Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
+
+# Build for production
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+### 3. Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Automatically configured by Lovable Cloud:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_PUBLISHABLE_KEY`
+- `VITE_SUPABASE_PROJECT_ID`
 
-**Use GitHub Codespaces**
+## 📁 Project Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+src/
+├── components/
+│   ├── ui/                      # shadcn/ui components
+│   ├── layouts/                 # Layout components
+│   ├── AppSidebar.tsx           # Main navigation
+│   ├── CreateProjectModal.tsx   # Project creation
+│   ├── CreateTeamModal.tsx      # Team creation
+│   ├── InviteEmployeeModal.tsx  # Employee invitation
+│   ├── DashboardAnalytics.tsx   # Charts & analytics
+│   └── ProtectedRoute.tsx       # Route protection
+├── hooks/
+│   └── useAuth.tsx              # Authentication hook
+├── pages/
+│   ├── Auth.tsx                 # Login/Signup
+│   ├── Dashboard.tsx            # Main dashboard
+│   ├── Projects.tsx             # Projects page
+│   └── Teams.tsx                # Teams page
+└── integrations/supabase/       # Supabase client
 
-## What technologies are used for this project?
+supabase/
+└── migrations/                  # Database migrations
+```
 
-This project is built with:
+## 💼 Usage Guide
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Admin Workflow
+1. Login with admin credentials
+2. Create teams to organize employees
+3. Invite employees via "Invite Employee" button
+4. Create projects and assign to teams
+5. Create and assign tasks to team members
+6. Monitor progress via analytics dashboard
 
-## How can I deploy this project?
+### Employee Workflow
+1. Login with provided credentials
+2. View assigned tasks on dashboard
+3. View project and team information
+4. No editing capabilities
 
-Simply open [Lovable](https://lovable.dev/projects/578e1ec8-b49c-4123-922d-1adcdd3d7376) and click on Share -> Publish.
+## 🔐 Security Features
 
-## Can I connect a custom domain to my Lovable project?
+1. **Row-Level Security (RLS)** on all Supabase tables
+2. **Server-side role verification** using `has_role()` function
+3. **Protected routes** with admin checks
+4. **Input validation** using Zod schemas
+5. **Secure authentication** via Supabase Auth
 
-Yes, you can!
+## ✅ Testing Checklist
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- [ ] Admin account created with correct email
+- [ ] Admin role assigned in database
+- [ ] Admin can create teams
+- [ ] Admin can create projects
+- [ ] Admin can invite employees
+- [ ] Employee account created
+- [ ] Employee has view-only access
+- [ ] Real-time updates working
+- [ ] Analytics charts displaying
+- [ ] Responsive design on mobile
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## 🚀 Deployment
+
+**Lovable Cloud Deployment:**
+1. Click "Publish" button in Lovable editor
+2. Frontend deploys automatically
+3. Backend (Supabase) is already connected
+4. Database migrations run automatically
+
+**Custom Domain:**
+- Go to Settings → Domains
+- Follow instructions to connect your domain
+
+## 🐛 Troubleshooting
+
+### Access Denied
+- Verify admin role in `user_roles` table
+- Clear browser cache and re-login
+
+### Real-Time Not Working
+- Check Supabase Realtime is enabled
+- Verify RLS policies allow reads
+
+### Charts Not Showing
+- Ensure projects/tasks exist in database
+- Check browser console for errors
+
+## 📚 Documentation
+
+- [Setup Guide](./SETUP_GUIDE.md) - Detailed setup instructions
+- [Lovable Documentation](https://docs.lovable.dev)
+- [Supabase Documentation](https://supabase.com/docs)
+
+## 📝 License
+
+MIT License
+
+---
+
+Built with ❤️ using Lovable, React, Supabase, and modern web technologies.

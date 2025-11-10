@@ -11,9 +11,14 @@ import {
   Plus,
   TrendingUp,
   Users,
-  FolderKanban
+  FolderKanban,
+  UserPlus
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { CreateProjectModal } from '@/components/CreateProjectModal';
+import { CreateTeamModal } from '@/components/CreateTeamModal';
+import { InviteEmployeeModal } from '@/components/InviteEmployeeModal';
+import { DashboardAnalytics } from '@/components/DashboardAnalytics';
 
 export default function Dashboard() {
   const { user, isAdmin } = useAuth();
@@ -24,8 +29,14 @@ export default function Dashboard() {
     overdueTasks: 0,
     totalProjects: 0,
     totalTeams: 0,
+    completedProjects: 0,
+    inProgressProjects: 0,
+    pendingProjects: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -67,6 +78,10 @@ export default function Dashboard() {
         return new Date(t.due_date) < now;
       }).length || 0;
 
+      const completedProjects = projects?.filter(p => p.status === 'completed').length || 0;
+      const inProgressProjects = projects?.filter(p => p.status === 'in_progress').length || 0;
+      const pendingProjects = projects?.filter(p => p.status === 'pending').length || 0;
+
       setStats({
         totalTasks: tasks?.length || 0,
         completedTasks: completed,
@@ -74,6 +89,9 @@ export default function Dashboard() {
         overdueTasks: overdue,
         totalProjects: projects?.length || 0,
         totalTeams: teams?.length || 0,
+        completedProjects,
+        inProgressProjects,
+        pendingProjects,
       });
     } catch (error: any) {
       console.error('Error fetching stats:', error);
@@ -139,14 +157,19 @@ export default function Dashboard() {
             Welcome back! Here's an overview of your tasks and projects.
           </p>
         </div>
-        <div className="flex gap-2">
-          {isAdmin && (
-            <Button variant="outline" size="lg" className="gap-2">
+        {isAdmin && (
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="gap-2"
+              onClick={() => setShowProjectModal(true)}
+            >
               <Plus className="h-4 w-4" />
               New Project
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Stats Grid */}
@@ -204,6 +227,9 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Analytics Charts */}
+      <DashboardAnalytics stats={stats} />
+
       {/* Quick Actions */}
       {isAdmin && (
         <motion.div
@@ -219,22 +245,50 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-3">
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setShowTeamModal(true)}
+              >
                 <Plus className="h-4 w-4" />
                 Create Team
               </Button>
-              <Button variant="outline" className="gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setShowProjectModal(true)}
+              >
                 <Plus className="h-4 w-4" />
                 Create Project
               </Button>
-              <Button variant="outline" className="gap-2">
-                <Users className="h-4 w-4" />
-                Invite Members
+              <Button 
+                variant="outline" 
+                className="gap-2"
+                onClick={() => setShowInviteModal(true)}
+              >
+                <UserPlus className="h-4 w-4" />
+                Invite Employee
               </Button>
             </CardContent>
           </Card>
         </motion.div>
       )}
+
+      {/* Modals */}
+      <CreateProjectModal 
+        open={showProjectModal} 
+        onOpenChange={setShowProjectModal}
+        onSuccess={fetchStats}
+      />
+      <CreateTeamModal 
+        open={showTeamModal} 
+        onOpenChange={setShowTeamModal}
+        onSuccess={fetchStats}
+      />
+      <InviteEmployeeModal 
+        open={showInviteModal} 
+        onOpenChange={setShowInviteModal}
+      />
     </div>
   );
 }
