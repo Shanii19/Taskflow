@@ -33,24 +33,33 @@ export default function Teams() {
   const fetchTeams = async () => {
     try {
       setLoading(true);
+      
+      // Fetch teams with team_members
       const { data: teamsData, error: teamsError } = await supabase
         .from('teams')
-        .select(`
-          *,
-          team_members (
-            user_id,
-            profiles (
-              id,
-              full_name,
-              email
-            )
-          )
-        `)
+        .select('*, team_members(user_id)')
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
       if (teamsError) throw teamsError;
-      setTeams(teamsData || []);
+
+      // Fetch all profiles
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, email');
+
+      if (profilesError) throw profilesError;
+
+      // Map profiles to teams
+      const teamsWithProfiles = teamsData?.map(team => ({
+        ...team,
+        team_members: team.team_members?.map((member: any) => ({
+          user_id: member.user_id,
+          profiles: profilesData?.find(p => p.id === member.user_id)
+        }))
+      }));
+
+      setTeams(teamsWithProfiles || []);
     } catch (error: any) {
       console.error('Error fetching teams:', error);
       toast.error('Failed to load teams');
