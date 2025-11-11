@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { CreateProjectModal } from '@/components/CreateProjectModal';
+import { ProjectDetailsModal } from '@/components/ProjectDetailsModal';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,6 +40,8 @@ export default function Projects() {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -151,16 +154,22 @@ export default function Projects() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.3 }}
             >
-              <Card className="task-card-hover">
+              <Card 
+                className="task-card-hover cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+                onClick={() => {
+                  setSelectedProject(project);
+                  setShowDetailsModal(true);
+                }}
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className={statusColors[project.status as keyof typeof statusColors]}>
+                        <Badge className={`${statusColors[project.status as keyof typeof statusColors]} transition-transform duration-200 hover:scale-110`}>
                           {statusLabels[project.status as keyof typeof statusLabels]}
                         </Badge>
                       </div>
-                      <CardTitle className="text-xl">{project.name}</CardTitle>
+                      <CardTitle className="text-xl transition-colors duration-200 group-hover:text-primary">{project.name}</CardTitle>
                       {project.description && (
                         <CardDescription className="mt-2">
                           {project.description}
@@ -171,8 +180,11 @@ export default function Projects() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteProjectId(project.id)}
+                        className="text-destructive hover:text-destructive transition-all duration-200 hover:scale-110"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteProjectId(project.id);
+                        }}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -211,6 +223,13 @@ export default function Projects() {
       <CreateProjectModal
         open={showCreateModal}
         onOpenChange={setShowCreateModal}
+        onSuccess={fetchProjects}
+      />
+
+      <ProjectDetailsModal
+        project={selectedProject}
+        open={showDetailsModal}
+        onOpenChange={setShowDetailsModal}
         onSuccess={fetchProjects}
       />
 
