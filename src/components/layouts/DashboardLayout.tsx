@@ -20,13 +20,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         
         <div className="flex-1 flex flex-col w-full">
           <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
-            <SidebarTrigger />
+            <SidebarTrigger className="transition-all duration-200 hover:bg-accent" />
             
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="h-9 w-9"
+              className="h-9 w-9 transition-all duration-300 hover:scale-110 hover:bg-accent"
             >
               <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />

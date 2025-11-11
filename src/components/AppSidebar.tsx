@@ -70,7 +70,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end
-                      className="hover:bg-sidebar-accent transition-colors"
+                      className="hover:bg-sidebar-accent transition-all duration-200 hover:translate-x-1"
                       activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
                     >
                       <item.icon className="h-4 w-4" />

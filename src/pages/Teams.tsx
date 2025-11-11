@@ -39,7 +39,7 @@ export default function Teams() {
           *,
           team_members (
             user_id,
-            profiles:user_id (
+            profiles (
               id,
               full_name,
               email
@@ -140,7 +140,7 @@ export default function Teams() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.3 }}
             >
-              <Card className="task-card-hover">
+              <Card className="task-card-hover transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

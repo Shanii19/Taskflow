@@ -164,7 +164,7 @@ export default function Dashboard() {
             <Button 
               variant="outline" 
               size="lg" 
-              className="gap-2"
+              className="gap-2 transition-all duration-200 hover:scale-105"
               onClick={() => setShowProjectModal(true)}
             >
               <Plus className="h-4 w-4" />
@@ -182,6 +182,7 @@ export default function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.3 }}
+              className="transition-all duration-300 hover:-translate-y-2 hover:shadow-lg"
             >
               <Card className="task-card-hover border-border/50 cursor-pointer hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -215,7 +216,7 @@ export default function Dashboard() {
             transition={{ delay: 0.4 + index * 0.1, duration: 0.3 }}
           >
             <Card 
-              className="border-border/50 cursor-pointer hover:shadow-lg transition-shadow"
+              className="border-border/50 cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
               onClick={() => navigate(`/${card.title.toLowerCase()}`)}
             >
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -258,7 +259,7 @@ export default function Dashboard() {
             <CardContent className="flex flex-wrap gap-3">
               <Button 
                 variant="outline" 
-                className="gap-2"
+                className="gap-2 transition-all duration-200 hover:scale-105"
                 onClick={() => setShowTeamModal(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -266,7 +267,7 @@ export default function Dashboard() {
               </Button>
               <Button 
                 variant="outline" 
-                className="gap-2"
+                className="gap-2 transition-all duration-200 hover:scale-105"
                 onClick={() => setShowProjectModal(true)}
               >
                 <Plus className="h-4 w-4" />
@@ -274,7 +275,7 @@ export default function Dashboard() {
               </Button>
               <Button 
                 variant="outline" 
-                className="gap-2"
+                className="gap-2 transition-all duration-200 hover:scale-105"
                 onClick={() => setShowInviteModal(true)}
               >
                 <UserPlus className="h-4 w-4" />
