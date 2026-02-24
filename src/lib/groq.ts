@@ -1,10 +1,5 @@
 import Groq from 'groq-sdk';
 
-const groq = new Groq({
-    apiKey: import.meta.env.VITE_GROQ_API_KEY,
-    dangerouslyAllowBrowser: true, // required for client-side usage
-});
-
 export interface AITaskSuggestion {
     title: string;
     description: string;
@@ -16,6 +11,16 @@ export interface AITaskSuggestion {
  * task title, description, and priority level.
  */
 export async function generateTaskWithAI(prompt: string): Promise<AITaskSuggestion> {
+    const apiKey = import.meta.env.VITE_GROQ_API_KEY;
+    if (!apiKey) {
+        throw new Error('Groq API Key (VITE_GROQ_API_KEY) is not set.');
+    }
+
+    const groq = new Groq({
+        apiKey,
+        dangerouslyAllowBrowser: true,
+    });
+
     const completion = await groq.chat.completions.create({
         model: 'llama-3.3-70b-versatile',
         messages: [
