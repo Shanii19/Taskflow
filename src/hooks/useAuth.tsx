@@ -1,8 +1,18 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+
+const generateId = () => typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+
+// Mock types
+interface User {
+  id: string;
+  email: string;
+  user_metadata: { full_name: string };
+}
+interface Session {
+  user: User;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -11,7 +21,6 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, fullName: string) => Promise<void>;
   signOut: () => Promise<void>;
-  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,117 +29,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Check admin role when user changes
-        if (session?.user) {
-          setTimeout(() => {
-            checkAdminRole(session.user.id);
-          }, 0);
-        } else {
-          setIsAdmin(false);
-        }
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdminRole(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const checkAdminRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle();
-
-      if (error) throw error;
-      setIsAdmin(!!data);
-    } catch (error) {
-      console.error('Error checking admin role:', error);
-      setIsAdmin(false);
+    // Check local storage for mock session
+    const storedUser = localStorage.getItem('taskflow_mock_user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      setSession({ user: parsedUser });
     }
-  };
+    setLoading(false);
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-      toast.success('Welcome back!');
+      const mockUser: User = { id: generateId(), email, user_metadata: { full_name: 'Local User' } };
+      localStorage.setItem('taskflow_mock_user', JSON.stringify(mockUser));
+      setUser(mockUser);
+      setSession({ user: mockUser });
+      toast.success('Welcome back (Local)!');
       navigate('/dashboard');
     } catch (error: any) {
-      console.error('Sign in error:', error);
-      toast.error(error.message || 'Failed to sign in');
-      throw error;
+      toast.error('Failed to sign in');
     }
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/dashboard`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-
-      if (error) throw error;
-      toast.success('Account created successfully!');
+      const mockUser: User = { id: generateId(), email, user_metadata: { full_name: fullName } };
+      localStorage.setItem('taskflow_mock_user', JSON.stringify(mockUser));
+      setUser(mockUser);
+      setSession({ user: mockUser });
+      toast.success('Account created locally!');
       navigate('/dashboard');
     } catch (error: any) {
-      console.error('Sign up error:', error);
-      if (error.message?.includes('already registered')) {
-        toast.error('This email is already registered. Please sign in instead.');
-      } else {
-        toast.error(error.message || 'Failed to create account');
-      }
-      throw error;
+      toast.error('Failed to create account');
     }
   };
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      toast.success('Signed out successfully');
+      localStorage.removeItem('taskflow_mock_user');
+      setUser(null);
+      setSession(null);
+      toast.success('Signed out locally');
       navigate('/auth');
     } catch (error: any) {
-      console.error('Sign out error:', error);
-      toast.error(error.message || 'Failed to sign out');
+      toast.error('Failed to sign out');
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, isAdmin }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

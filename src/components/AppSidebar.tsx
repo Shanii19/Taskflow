@@ -1,8 +1,7 @@
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  Users, 
+import {
+  LayoutDashboard,
   LogOut,
+  CheckSquare,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/hooks/useAuth';
@@ -25,13 +24,12 @@ import { Separator } from '@/components/ui/separator';
 
 const menuItems = [
   { title: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
-  { title: 'Projects', url: '/projects', icon: FolderKanban },
-  { title: 'Teams', url: '/teams', icon: Users },
+  { title: 'Tasks', url: '/tasks', icon: CheckSquare },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut } = useAuth();
 
   const userInitials = user?.email?.slice(0, 2).toUpperCase() || 'U';
   const isCollapsed = state === 'collapsed';
@@ -41,20 +39,15 @@ export function AppSidebar() {
       <SidebarHeader className="border-b border-sidebar-border p-4">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Users className="h-5 w-5 text-primary-foreground" />
-            </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold text-sidebar-foreground">TaskFlow</span>
-              <span className="text-xs text-muted-foreground">
-                {isAdmin ? 'Admin' : 'Employee'}
-              </span>
+              <span className="text-xs text-muted-foreground">Workspace</span>
             </div>
           </div>
         )}
         {isCollapsed && (
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary mx-auto">
-            <Users className="h-5 w-5 text-primary-foreground" />
+            <CheckSquare className="h-5 w-5 text-primary-foreground" />
           </div>
         )}
       </SidebarHeader>

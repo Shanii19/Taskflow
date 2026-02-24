@@ -1,44 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { 
-  CheckCircle2, 
-  Clock, 
-  AlertCircle, 
-  Plus,
-  TrendingUp,
-  Users,
-  FolderKanban,
-  UserPlus
+import {
+  CheckCircle2,
+  Clock,
+  AlertCircle,
 } from 'lucide-react';
-import { toast } from 'sonner';
-import { CreateProjectModal } from '@/components/CreateProjectModal';
-import { CreateTeamModal } from '@/components/CreateTeamModal';
-import { InviteEmployeeModal } from '@/components/InviteEmployeeModal';
-import { DashboardAnalytics } from '@/components/DashboardAnalytics';
+import { storage } from '@/lib/storage';
 
 export default function Dashboard() {
-  const { user, isAdmin } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
     inProgressTasks: 0,
     overdueTasks: 0,
-    totalProjects: 0,
-    totalTeams: 0,
-    completedProjects: 0,
-    inProgressProjects: 0,
-    pendingProjects: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [showProjectModal, setShowProjectModal] = useState(false);
-  const [showTeamModal, setShowTeamModal] = useState(false);
-  const [showInviteModal, setShowInviteModal] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -48,56 +29,25 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // Fetch tasks
-      const { data: tasks, error: tasksError } = await supabase
-        .from('tasks')
-        .select('*')
-        .is('deleted_at', null);
-
-      if (tasksError) throw tasksError;
-
-      // Fetch projects
-      const { data: projects, error: projectsError } = await supabase
-        .from('projects')
-        .select('*')
-        .is('deleted_at', null);
-
-      if (projectsError) throw projectsError;
-
-      // Fetch teams
-      const { data: teams, error: teamsError } = await supabase
-        .from('teams')
-        .select('*')
-        .is('deleted_at', null);
-
-      if (teamsError) throw teamsError;
+      // Fetch tasks from local storage
+      const tasks = storage.getActiveTasks();
 
       const now = new Date();
-      const completed = tasks?.filter(t => t.status === 'done').length || 0;
-      const inProgress = tasks?.filter(t => t.status === 'in_progress').length || 0;
-      const overdue = tasks?.filter(t => {
+      const completed = tasks.filter(t => t.status === 'done').length;
+      const inProgress = tasks.filter(t => t.status === 'in_progress').length;
+      const overdue = tasks.filter(t => {
         if (!t.due_date || t.status === 'done') return false;
         return new Date(t.due_date) < now;
-      }).length || 0;
-
-      const completedProjects = projects?.filter(p => p.status === 'completed').length || 0;
-      const inProgressProjects = projects?.filter(p => p.status === 'in_progress').length || 0;
-      const pendingProjects = projects?.filter(p => p.status === 'pending').length || 0;
+      }).length;
 
       setStats({
-        totalTasks: tasks?.length || 0,
+        totalTasks: tasks.length,
         completedTasks: completed,
         inProgressTasks: inProgress,
         overdueTasks: overdue,
-        totalProjects: projects?.length || 0,
-        totalTeams: teams?.length || 0,
-        completedProjects,
-        inProgressProjects,
-        pendingProjects,
       });
     } catch (error: any) {
       console.error('Error fetching stats:', error);
-      toast.error('Failed to load dashboard stats');
     } finally {
       setLoading(false);
     }
@@ -134,21 +84,6 @@ export default function Dashboard() {
     },
   ];
 
-  const overviewCards = [
-    {
-      title: 'Projects',
-      value: stats.totalProjects,
-      icon: FolderKanban,
-      color: 'text-secondary',
-    },
-    {
-      title: 'Teams',
-      value: stats.totalTeams,
-      icon: Users,
-      color: 'text-accent',
-    },
-  ];
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -156,82 +91,36 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground mt-1">
-            Welcome back! Here's an overview of your tasks and projects.
+            Welcome back, {user?.user_metadata?.full_name || 'Local User'}! Here's an overview of your tasks.
           </p>
         </div>
-        {isAdmin && (
-          <div className="flex gap-2">
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="gap-2 transition-all duration-200 hover:scale-105"
-              onClick={() => setShowProjectModal(true)}
-            >
-              <Plus className="h-4 w-4" />
-              New Project
-            </Button>
-          </div>
-        )}
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat, index) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-              className="transition-all duration-300 hover:-translate-y-2 hover:shadow-lg"
-            >
-              <Card className="task-card-hover border-border/50 cursor-pointer hover:shadow-lg transition-shadow">
-                <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`p-2 rounded-lg ${stat.bgColor}`}>
-                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold text-foreground">
-                    {loading ? '...' : stat.value}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Click to view details
-                  </p>
-                </CardContent>
-              </Card>
-            </motion.div>
-        ))}
-      </div>
-
-      {/* Overview Section */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {overviewCards.map((card, index) => (
           <motion.div
-            key={card.title}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 + index * 0.1, duration: 0.3 }}
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.3 }}
+            className="transition-all duration-300 hover:-translate-y-2 hover:shadow-lg"
           >
-            <Card 
-              className="border-border/50 cursor-pointer hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
-              onClick={() => navigate(`/${card.title.toLowerCase()}`)}
-            >
+            <Card className="task-card-hover border-border/50 cursor-pointer hover:shadow-lg transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-xl font-semibold">{card.title}</CardTitle>
-                <card.icon className={`h-6 w-6 ${card.color}`} />
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  {stat.title}
+                </CardTitle>
+                <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold text-foreground">
-                  {loading ? '...' : card.value}
+                <div className="text-3xl font-bold text-foreground">
+                  {loading ? '...' : stat.value}
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Total active {card.title.toLowerCase()}
-                </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Click to view all
+                  Click to view details
                 </p>
               </CardContent>
             </Card>
@@ -239,68 +128,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Analytics Charts */}
-      <DashboardAnalytics stats={stats} />
-
-      {/* Quick Actions */}
-      {isAdmin && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.3 }}
-        >
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-primary" />
-                Quick Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <Button 
-                variant="outline" 
-                className="gap-2 transition-all duration-200 hover:scale-105"
-                onClick={() => setShowTeamModal(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Create Team
-              </Button>
-              <Button 
-                variant="outline" 
-                className="gap-2 transition-all duration-200 hover:scale-105"
-                onClick={() => setShowProjectModal(true)}
-              >
-                <Plus className="h-4 w-4" />
-                Create Project
-              </Button>
-              <Button 
-                variant="outline" 
-                className="gap-2 transition-all duration-200 hover:scale-105"
-                onClick={() => setShowInviteModal(true)}
-              >
-                <UserPlus className="h-4 w-4" />
-                Invite Employee
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Modals */}
-      <CreateProjectModal 
-        open={showProjectModal} 
-        onOpenChange={setShowProjectModal}
-        onSuccess={fetchStats}
-      />
-      <CreateTeamModal 
-        open={showTeamModal} 
-        onOpenChange={setShowTeamModal}
-        onSuccess={fetchStats}
-      />
-      <InviteEmployeeModal 
-        open={showInviteModal} 
-        onOpenChange={setShowInviteModal}
-      />
     </div>
   );
 }

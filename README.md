@@ -1,203 +1,178 @@
-# TaskFlow - Team Task Management Application
+# 🗂️ TaskFlow — Team Task Management Platform
 
-A full-stack team task management application built with React, TypeScript, Tailwind CSS, Supabase, and Framer Motion.
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript) ![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38BDF8?logo=tailwindcss)
 
-## 🚀 Features
+**TaskFlow** is a lightweight, local-first team task management web application. It features an offline storage architecture, dark/light mode UI, animated state transitions, and interactive analytics charts.
 
-### Authentication & Authorization
-- Secure email/password authentication via Supabase Auth
-- Role-based access control (Admin & Employee roles)
-- Auto-confirmed email signups for testing
-- Protected routes with role verification
+---
 
-### Admin Capabilities
-- **Full Access**: Create, update, and delete all resources
-- **Team Management**: Create and manage teams
-- **Project Management**: Create projects, assign to teams, track progress and status
-- **Task Management**: Create, assign, and manage tasks
-- **Employee Management**: Invite and create employee accounts
-- **Analytics Dashboard**: View pie charts and bar graphs of project/task progress
+## 📋 Table of Contents
 
-### Employee Capabilities
-- **View-Only Access**: View assigned tasks only
-- **Limited Dashboard**: See only relevant information
-- No create, edit, or delete permissions
+- [What Is This App?](#-what-is-this-app)
+- [Features](#-features)
+- [Tech Stack](#-tech-stack)
+- [Project Structure](#-project-structure)
+- [Data Storage](#-data-storage)
+- [Getting Started (Local)](#-getting-started-local)
+- [App Pages](#-app-pages)
+- [Deployment](#-deployment)
 
-### Real-Time Features
-- Live updates using Supabase Realtime
-- Instant task and project changes across all clients
-- Real-time dashboard statistics
+---
 
-### Analytics & Reporting
-- **Pie Chart**: Task completion status (Completed, In Progress, Overdue)
-- **Bar Chart**: Project progress overview (Pending, In Progress, Completed)
-- Real-time data visualization using Recharts
+## 🤔 What Is This App?
 
-## 🛠 Technology Stack
+TaskFlow is designed to be a clean, structured way for individuals and small teams to securely manage tasks locally without needing a cloud database setup. It runs entirely on your device via the Web Storage API (`localStorage`), meaning all of your tasks stay completely private and offline.
 
-- **Frontend**: React 18, TypeScript, Vite
-- **Styling**: Tailwind CSS, Framer Motion
-- **Backend**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
-- **Charts**: Recharts
-- **UI Components**: shadcn/ui
-- **Form Validation**: Zod
-- **Routing**: React Router v6
+Think of it as a lightning-fast, highly responsive Trello alternative built entirely on modern open-source tech.
 
-## 📊 Database Schema
+---
 
-### Core Tables
-- `profiles` - User profile information
-- `user_roles` - Role assignments (admin/member)
-- `teams` - Team management
-- `projects` - Project tracking with status and progress
-- `tasks` - Task assignments and tracking
-- `team_members` - Junction table for team memberships
-- `comments` - Task comments
-- `attachments` - File attachments
-- `activity_logs` - Audit trail
+## ✨ Features
 
-## 🎯 Getting Started
+### 🔐 Instant Authentication
+- Local mock authentication — "Sign In" instantly to generate a secure local session.
+- Seamless creation of task environments isolated to your browser storage.
+- Zero backend configuration required.
 
-### 1. Initial Admin Setup
+### � Task Management Features
+| Feature | Description |
+|--------|-------------|
+| Create Tasks | Rapidly create and categorize tasks with titles, descriptions, status, and due dates |
+| Edit Tasks | Update task name, description, priority, and progress |
+| Delete Tasks | Soft-delete architecture protects accidental deletion of important data |
+| AI Generation | (Optional) Generate robust task descriptions and priorities using Groq AI integration |
 
-**IMPORTANT**: Create the admin account first!
+### 📊 Analytics Dashboard
+- **Pie Chart** — Task status breakdown: Completed, In Progress, Overdue
+- **Bar Chart** — Project status distribution
+- Built with **Recharts** and seamlessly themed for both dark and light mode
 
-- Email: `shayanmustafahassan@gmail.com`
-- Name: Shayan
-- Role: admin
+### 🎨 UI & UX
+- Smooth **Framer Motion** animations (page transitions, card entrances)
+- **Dark / Light / System** theme toggle via `next-themes`
+- Responsive sidebar that collapses to icon-only mode
+- Skeleton loading states and toast notifications
+- Beautiful custom checklist and calendar favicon
 
-**Steps:**
-1. Navigate to `/auth` in the app
-2. Click "Sign Up" tab
-3. Register with the admin email and name
-4. After signup, update the role to admin:
-   - Open Lovable Cloud Backend
-   - Go to Database → user_roles table
-   - Find your user_id and change role from 'member' to 'admin'
-5. Log out and log back in
+---
 
-📖 See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed setup instructions.
+## 🛠 Tech Stack
 
-### 2. Development
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 18 + TypeScript |
+| Build Tool | Vite 5 |
+| Styling | Tailwind CSS v3, `tailwindcss-animate` |
+| Animations | Framer Motion |
+| UI Components | shadcn/ui (Radix UI primitives) |
+| Data Storage | LocalStorage API (`src/lib/storage.ts`) |
+| Auth | Local Mock Authentication (`useAuth.tsx`) |
+| Charts | Recharts |
+| Form Validation | Zod + React Hook Form |
+| Routing | React Router DOM v6 |
+| Theming | next-themes |
+| Icons | Lucide React |
 
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### 3. Environment Variables
-
-Automatically configured by Lovable Cloud:
-- `VITE_SUPABASE_URL`
-- `VITE_SUPABASE_PUBLISHABLE_KEY`
-- `VITE_SUPABASE_PROJECT_ID`
+---
 
 ## 📁 Project Structure
 
 ```
-src/
-├── components/
-│   ├── ui/                      # shadcn/ui components
-│   ├── layouts/                 # Layout components
-│   ├── AppSidebar.tsx           # Main navigation
-│   ├── CreateProjectModal.tsx   # Project creation
-│   ├── CreateTeamModal.tsx      # Team creation
-│   ├── InviteEmployeeModal.tsx  # Employee invitation
-│   ├── DashboardAnalytics.tsx   # Charts & analytics
-│   └── ProtectedRoute.tsx       # Route protection
-├── hooks/
-│   └── useAuth.tsx              # Authentication hook
-├── pages/
-│   ├── Auth.tsx                 # Login/Signup
-│   ├── Dashboard.tsx            # Main dashboard
-│   ├── Projects.tsx             # Projects page
-│   └── Teams.tsx                # Teams page
-└── integrations/supabase/       # Supabase client
-
-supabase/
-└── migrations/                  # Database migrations
+f:\Taskflow\
+├── public/                        # Static assets (including favicon.png)
+├── src/
+│   ├── components/
+│   │   ├── ui/                    # All shadcn/ui base components
+│   │   ├── layouts/
+│   │   │   └── DashboardLayout.tsx   # Sidebar + main content shell
+│   │   ├── AppSidebar.tsx         # Collapsible navigation sidebar
+│   │   ├── NavLink.tsx            # Active-aware nav link wrapper
+│   │   ├── ProtectedRoute.tsx     # Auth guard for protected pages
+│   │   └── CreateTaskModal.tsx    # Modal to create a new task
+│   ├── hooks/
+│   │   ├── useAuth.tsx            # Auth context: mock local sign in/up/out
+│   │   ├── use-toast.ts           # Toast notification hook
+│   │   └── use-mobile.tsx         # Responsive breakpoint hook
+│   ├── lib/
+│   │   └── storage.ts             # LocalStorage Database Utility
+│   ├── pages/
+│   │   ├── Auth.tsx               # Sign In / Sign Up page
+│   │   ├── Dashboard.tsx          # Main overview with stats
+│   │   ├── Tasks.tsx              # Browse, create, delete tasks
+│   │   ├── Settings.tsx           # User settings page
+│   │   └── NotFound.tsx           # 404 page
+│   ├── App.tsx                    # Route definitions + providers
+│   ├── main.tsx                   # React app entry point
+│   └── index.css                  # Global styles + Tailwind + CSS vars
+├── vite.config.ts
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json
 ```
-
-## 💼 Usage Guide
-
-### Admin Workflow
-1. Login with admin credentials
-2. Create teams to organize employees
-3. Invite employees via "Invite Employee" button
-4. Create projects and assign to teams
-5. Create and assign tasks to team members
-6. Monitor progress via analytics dashboard
-
-### Employee Workflow
-1. Login with provided credentials
-2. View assigned tasks on dashboard
-3. View project and team information
-4. No editing capabilities
-
-## 🔐 Security Features
-
-1. **Row-Level Security (RLS)** on all Supabase tables
-2. **Server-side role verification** using `has_role()` function
-3. **Protected routes** with admin checks
-4. **Input validation** using Zod schemas
-5. **Secure authentication** via Supabase Auth
-
-## ✅ Testing Checklist
-
-- [ ] Admin account created with correct email
-- [ ] Admin role assigned in database
-- [ ] Admin can create teams
-- [ ] Admin can create projects
-- [ ] Admin can invite employees
-- [ ] Employee account created
-- [ ] Employee has view-only access
-- [ ] Real-time updates working
-- [ ] Analytics charts displaying
-- [ ] Responsive design on mobile
-
-## 🚀 Deployment
-
-**Lovable Cloud Deployment:**
-1. Click "Publish" button in Lovable editor
-2. Frontend deploys automatically
-3. Backend (Supabase) is already connected
-4. Database migrations run automatically
-
-**Custom Domain:**
-- Go to Settings → Domains
-- Follow instructions to connect your domain
-
-## 🐛 Troubleshooting
-
-### Access Denied
-- Verify admin role in `user_roles` table
-- Clear browser cache and re-login
-
-### Real-Time Not Working
-- Check Supabase Realtime is enabled
-- Verify RLS policies allow reads
-
-### Charts Not Showing
-- Ensure projects/tasks exist in database
-- Check browser console for errors
-
-## 📚 Documentation
-
-- [Setup Guide](./SETUP_GUIDE.md) - Detailed setup instructions
-- [Lovable Documentation](https://docs.lovable.dev)
-- [Supabase Documentation](https://supabase.com/docs)
-
-## 📝 License
-
-MIT License
 
 ---
 
-Built with ❤️ using Lovable, React, Supabase, and modern web technologies.
+## 📊 Data Storage
+
+Data is managed purely in the browser using the `src/lib/storage.ts` module.
+
+| Entity | Purpose |
+|-------|---------|
+| `tasks` | Individual tasks with priority, due date, status stored in `localStorage` under `taskflow_tasks` |
+| `user` | Current active user session stored in `localStorage` securely with mock UUID definitions |
+
+**Soft Deletes:** Tasks use a `deleted_at` field instead of hard deletion to preserve history and prevent accidental permanent erasure.
+
+---
+
+## 🚀 Getting Started (Local)
+
+### Prerequisites
+- Node.js 18+ and npm
+
+### Steps
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start the development server
+npm run dev
+```
+
+The app will be available at **http://localhost:8080**.
+
+Simply click **Sign In** or **Sign Up** to create a local profile and begin using the app immediately!
+
+---
+
+## 📱 App Pages
+
+| Route | Page | Access |
+|-------|------|--------|
+| `/auth` | Sign In / Sign Up | Public |
+| `/dashboard` | Overview, stats, analytics | Auth required |
+| `/tasks` | All tasks board | Auth required |
+| `/settings` | User settings | Auth required |
+| `*` | 404 Not Found | Public |
+
+---
+
+## ☁️ Deployment
+
+### Deploy Frontend
+```bash
+npm run build       # Builds to /dist
+npm run preview     # Preview production build locally
+```
+You can upload the `/dist` folder to any static host: **Vercel, Netlify, Cloudflare Pages, etc.** Since the app requires zero backend infrastructure, the compiled bundle can be served anywhere safely.
+
+---
+
+## 📝 License
+
+MIT License — free to use, modify, and distribute.
+
+---
+
+> Built with React, TypeScript, Vite, Tailwind CSS, and shadcn/ui.
